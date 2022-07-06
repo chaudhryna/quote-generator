@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
 html {
   box-sizing: border-box;
 }
@@ -35,7 +37,7 @@ body {
 
 .fa-quote-left,
 .fa-quote-right {
-  font-size: 4rem;
+  font-size: 2.75rem;
   color: #673dd1;
   padding: 15px;
 }
@@ -46,6 +48,8 @@ body {
   font-weight: 400;
   font-style: italic;
 }
+
+/* Button styles */
 
 .button-container {
   margin-top: 15px;
@@ -99,7 +103,7 @@ button:active {
   }
   100% {
     transform: rotate(360deg);
-  }
+  } 
 }
 
 /* Media Query: Tablet or Smaller */

@@ -1,59 +1,68 @@
-const quoteContainer = document.getElementById('quote-container');
-const quoteText = document.getElementById('quote');
-const authorText = document.getElementById('author');
-const twitterBtn = document.getElementById('twitter');
-const newQuoteBtn = document.getElementById('new-quote');
-const loader = document.getElementById('loader');
+const quoteContainer = document.querySelector('#quote-container');
+const quoteText = document.querySelector('#quote');
+const authorText = document.querySelector('#author');
+const twitterBtn = document.querySelector('#twitter');
+const newQuoteBtn = document.querySelector('#new-quote');
+const loader = document.querySelector('#loader');
 
-function showLoadingSpinner() {
-  loader.hidden = false;
-  quoteContainer.hidden = true;
+let apiQuotes = [];
+
+// Show loading
+function loading() {
+    loader.hidden = false;
+    quoteContainer.hidden = true;
 }
 
-function removeLoadingSpinner() {
-  if (!loader.hidden) {
+// Hide loading
+function complete() {
     quoteContainer.hidden = false;
     loader.hidden = true;
-  }
 }
 
-// Get quote from API
-async function getQuote() {
-  showLoadingSpinner();
-  const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-  const apiUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
-  try {
-    const response = await fetch(proxyUrl + apiUrl);
-    const data = await response.json();
-    // If author is blank, add 'unknown'
-    if (data.quoteAuthor === '') {
-      authorText.innerText = 'Unknown';
+// Show new quote
+function newQuote() {
+    loading();
+    // Pick a random quote from apiQuotes array
+    const quote = apiQuotes[Math.floor(Math.random() * apiQuotes.length)];
+    // Check if author field is blank
+    if (!quote.author) {
+        authorText.textContent = 'Unknown';
     } else {
-      authorText.innerText = data.quoteAuthor;
+        authorText.textContent = quote.author;
     }
-    // Reduce font size for long quotes
-    if (data.quoteText.length > 120) {
-      quoteText.classList.add('long-quote');
+    // Check quote length
+    if (quote.text.length > 120) {
+        quoteText.classList.add('long-quote');
     } else {
-      quoteText.classList.remove('long-quote');
+        quoteText.classList.remove('long-quote');
     }
-    quoteText.innerText = data.quoteText;
-    // Stop loader and show quote
-    removeLoadingSpinner();
-  } catch (error) {
-    getQuote();
-  }
+    // Set quote and hide loader
+    quoteText.textContent = quote.text;
+    complete();
 }
-// Tweet quote
+
+// Get quotes from API
+async function getQuotes() {
+    loading();
+    const apiUrl = 'https://type.fit/api/quotes';
+    try {
+        const response = await fetch(apiUrl);
+        apiQuotes = await response.json();
+        newQuote();
+    } catch (error) {
+        // Catch error here
+    }
+}
+
+// Tweet a quote
 function tweetQuote() {
-  const quote = quoteText.innerText;
-  const author = authorText.innerText;
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${quote} - ${author}`;
-  window.open(twitterUrl, '_blank');
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${quoteText.textContent} - ${authorText.textContent}`;
+    window.open(twitterUrl, '_blank');
 }
-// Event Listeners
-newQuoteBtn.addEventListener('click', getQuote);
+
+// Event listeners
+newQuoteBtn.addEventListener('click', newQuote);
 twitterBtn.addEventListener('click', tweetQuote);
 
 // On load
-getQuote();
+getQuotes();
